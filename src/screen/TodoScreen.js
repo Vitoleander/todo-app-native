@@ -11,6 +11,10 @@ const TodoScreen = () => {
 
     //handle add task
     const handleAddTask = () => {
+        if (todo === '') {
+            return
+        }
+
         setTodoList([...todoList, { id: Date.now().toString(), title: todo }])
         setTodo('')
     }
@@ -19,6 +23,20 @@ const TodoScreen = () => {
     const handleEditTask = (todo) => {
         setEditTodo(todo)
         setTodo(todo.title)
+    }
+
+    const handleUpdateTodo = () => {
+        const updatedTodos = todoList.map((item) => {
+
+            if (item.id === editTodo.id){
+                return {...item, title: todo}
+            }
+            
+            return item
+        })
+        setTodoList(updatedTodos)
+        setEditTodo(null)
+        setTodo('')
     }
 
     //handle delete task
@@ -32,7 +50,7 @@ const TodoScreen = () => {
     const renderTodos = ({item, index}) => {
         return (
             <View style={{
-                backgroundColor: '#b5492f',
+                backgroundColor: '#678c92',
                 borderRadius: 6,
                 paddingHorizontal: 16,
                 paddingVertical: 18,
@@ -76,7 +94,7 @@ const TodoScreen = () => {
       <TextInput 
         style={{
             borderWidth: 2, 
-            borderColor: "#b5492f", 
+            borderColor: "#4d6227", 
             borderRadius: 6, 
             paddingVertical: 18,
             paddingHorizontal: 16
@@ -86,7 +104,26 @@ const TodoScreen = () => {
         onChangeText={(newTask) => setTodo(newTask)}
       />
 
-      <TouchableOpacity 
+    {
+        editTodo ? <TouchableOpacity 
+        style={{
+          backgroundColor: '#4d6227',
+          borderRadius: 6,
+          paddingVertical: 18,
+          marginTop: 16,
+          marginBottom: 40,
+          alignItems: 'center'
+        }}
+        onPress={() => handleUpdateTodo()}
+        >
+  
+          <Text
+          style={{
+              color: '#fff',
+              fontWeight: 'bold',
+              fontSize: 20,
+          }}>Save</Text>
+        </TouchableOpacity> : <TouchableOpacity 
       style={{
         backgroundColor: '#4d6227',
         borderRadius: 6,
@@ -105,6 +142,7 @@ const TodoScreen = () => {
             fontSize: 20,
         }}>Add</Text>
       </TouchableOpacity>
+    }
 
       {/* Render Todo list*/}
 
