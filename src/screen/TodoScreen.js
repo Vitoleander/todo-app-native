@@ -2,11 +2,13 @@ import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'r
 import { IconButton } from 'react-native-paper'
 import React, { useState } from 'react'
 import Fallback from '../components/Fallback'
+import Finished from '../components/Finished'
 
 const TodoScreen = () => {
     //init local state
     const [todo, setTodo] = useState('')
     const [todoList, setTodoList] = useState([])
+    const [checkedList, setCheckedList] = useState([])
     const [editTodo, setEditTodo] = useState(null)
 
     //handle add task
@@ -36,14 +38,64 @@ const TodoScreen = () => {
         })
         setTodoList(updatedTodos)
         setEditTodo(null)
-        setTodo('')
+    }
+
+    //handle finished task
+    const handleFinishedTask = (id) => {
+      const finishedTodo = todoList.map((item) => {
+        if (item.id === todo.id){
+          return {...item, title: todo}
+        }
+        return item
+      })
+      const finDelete = todoList.filter((todo) => todo.id !== id)
+      setCheckedList(finishedTodo)
+      setTodoList('') //Raderar alla istället för den aktuella tasken
+
     }
 
     //handle delete task
     const handleDeleteTask = (id) => {
         const updatedTodoList = todoList.filter((todo) => todo.id !== id)
 
-        setTodoList(updatedTodoList);
+        setTodoList(updatedTodoList)
+    }
+
+    // handle delete checked task
+    const handleDeleteCheck = (id) => {
+      const deleteTodo = checkedList.filter((todo) => todo.id !== id )
+
+      setCheckedList(deleteTodo)
+    }
+
+    //render finished list
+    const renderChecked = ({item, index}) => {
+      return (
+          <View style={{
+              backgroundColor: '#678c92',
+              borderRadius: 6,
+              paddingHorizontal: 16,
+              paddingVertical: 18,
+              marginBottom: 14,
+              flexDirection: 'row',
+              alignItems: 'center'
+          }}>
+              <Text style={{
+                  color: '#fff',
+                  fontSize: 20,
+                  fontWeight: '600',
+                  flex: 1
+                  }}>
+                  {item.title}
+              </Text>
+
+              <IconButton 
+                  icon='trash-can'
+                  iconColor='#fff'
+                  onPress={()=> handleDeleteCheck(todo.id)}
+                  />
+          </View>
+      )
     }
 
     //render list
@@ -73,7 +125,9 @@ const TodoScreen = () => {
                     onPress={() => handleEditTask(item)}
                 />
 
-                <IconButton icon='check'/>
+                <IconButton icon='check'
+                  iconColor='#fff'
+                  onPress={() => handleFinishedTask(item)}/>
 
                 <IconButton 
                     icon='trash-can'
@@ -149,9 +203,14 @@ const TodoScreen = () => {
       <FlatList data={todoList} renderItem={renderTodos}/>
 
       {
-        todoList.length <=0 && <Fallback />
+        checkedList.length >=1 && <Finished />
       }
 
+      <FlatList data={checkedList} renderItem={renderChecked}/>
+
+      {
+        todoList.length <=0 && <Fallback />
+      }
     </View>
   )
 }
